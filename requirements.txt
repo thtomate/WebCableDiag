@@ -1,0 +1,4 @@
+Flask==2.3.2
+netmiko==4.3.0
+pyyaml==6.0
+cachetools==5.3.0

@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="panel">
+  <h2>Switch: {{ device.name }} ({{ device.host }}) - Site: {{ site.description }}</h2>
+
+  <h3>MAC-Adress-Suche auf diesem Switch (An welchem Port ist das Endgerät?)</h3>
+  <form method="post">
+    <input name="mac" placeholder="00:11:22:33:44:55 oder 0011.2233.4455" style="width:40%">
+    <button name="search_mac" type="submit">Suchen</button>
+  </form>
+
+  <h3>Verfügbare Interfaces</h3>
+  {% if interfaces %}
+    <div>
+      <button type="button" id="select_all">Alle auswählen</button>
+      <button type="button" id="deselect_all">Alle abwählen</button>
+    </div>
+    <form method="post" id="tdr_form">
+      <div style="max-height:300px; overflow:auto; border:1px solid #eee; padding:8px; margin-top:8px;">
+        {% for iface in interfaces %}
+          <div style="padding:4px 0;">
+            <label>
+              <input type="checkbox" name="interfaces" value="{{ iface.name }}" {% if iface.name in highlighted_ifaces %}checked{% endif %}>
+              <strong>{{ iface.name }}</strong>
+              &nbsp; <small>{{ iface.status or "" }} {{ iface.description or "" }}</small>
+            </label>
+          </div>
+        {% endfor %}
+      </div>
+
+      <h4>Oder manuell hinzufügen</h4>
+      <input name="interfaces_free" placeholder="z.B. Gi1/0/24, Gi1/0/25" style="width:60%"><br><br>
+
+      <button name="run_tdr" type="submit">TDR ausführen</button>
+    </form>
+  {% else %}
+    <p><em>Keine Interfaces gefunden oder Fehler beim Abruf.</em></p>
+    <form method="post">
+      <label>Interfaces (Kommagetrennt)</label><br>
+      <input name="interfaces_free" style="width:60%"><br><br>
+      <button name="run_tdr" type="submit">TDR ausführen</button>
+    </form>
+  {% endif %}
+
+</div>
+<p><a href="{{ url_for('site_page', site_name=site.name) }}">Zurück zur Site</a></p>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  var selectAll = document.getElementById("select_all");
+  var deselectAll = document.getElementById("deselect_all");
+  if (selectAll) {
+    selectAll.addEventListener("click", function() {
+      document.querySelectorAll("input[type=checkbox][name=interfaces]").forEach(function(cb){ cb.checked = true; });
+    });
+  }
+  if (deselectAll) {
+    deselectAll.addEventListener("click", function() {
+      document.querySelectorAll("input[type=checkbox][name=interfaces]").forEach(function(cb){ cb.checked = false; });
+    });
+  }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="panel">
+  <h2>Standort: {{ site.description }} ({{ site.name }})</h2>
+  <p><strong>Zentraler Switch:</strong> {{ central.name }}</p>
+
+  <h3>MAC-Adress-Suche auf zentralem Switch (An welchem Switch ist das Endgerät?)</h3>
+  <form method="post">
+    <input name="mac" placeholder="00:11:22:33:44:55 oder 0011.2233.4455" style="width:40%">
+    <button name="search_mac" type="submit">Suchen</button>
+  </form>
+</div>
+
+<div class="panel">
+  <h3>Switche zur Auswahl</h3>
+  <!--<form method="post">
+    <select name="access_switch">
+      {% for sw in access_list %}
+        <option value="{{ sw.name }}">{{ sw.name }} - {{ sw.host }}</option>
+      {% endfor %}
+    </select>
+    <button name="select_switch" type="submit">Auswählen</button>
+  </form>-->
+  <ul>
+    {% for sw in access_list %}
+      <li><a href="{{ url_for('switch_detail', site_name=site.name, name=sw.name) }}">{{ sw.name }}</a></li>
+    {% endfor %}
+  </ul>
+</div>
+
+<p><a href="{{ url_for('index') }}">Zurück zur Standortauswahl</a></p>
+{% endblock %}

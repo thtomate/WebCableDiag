@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8">
+    <title>WebCableDiag</title>
+    <style>
+      body { font-family: Arial, sans-serif; margin: 20px; }
+      .panel { border:1px solid #ddd; padding:12px; margin-bottom:12px; border-radius:4px; }
+      pre { background:#f6f6f6; padding:10px; overflow:auto; }
+      table { border-collapse: collapse; width:100%; }
+      th, td { border:1px solid #ddd; padding:8px; text-align:left; }
+    </style>
+  </head>
+  <body>
+    <h1>WebCableDiag</h1>
+    <div>
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <div class="panel" style="background:#fff4f4;border-color:#f5c2c2;">
+            {% for m in messages %}<div>{{ m }}</div>{% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+    </div>
+    {% block content %}{% endblock %}
+  </body>
+</html>

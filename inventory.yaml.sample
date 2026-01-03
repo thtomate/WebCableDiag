@@ -1,0 +1,63 @@
+sites:
+  - name: site-berlin
+    description: Büro Berlin
+    central_switch:
+      name: core-berlin
+      host: 10.0.1.1
+      device_type: cisco_ios
+      username: admin
+      password: secret
+      secret: secret
+    access_switches:
+      - name: sw-berlin-01
+        host: 10.0.1.11
+        device_type: cisco_ios
+        username: admin
+        password: secret
+        secret: secret
+      - name: sw-berlin-02
+        host: 10.0.1.12
+        device_type: cisco_ios
+        username: admin
+        password: secret
+        secret: secret
+
+  - name: site-duesseldorf
+    description: Büro Düsseldorf
+    central_switch:
+      name: core-duesseldorf
+      host: 10.0.2.1
+      device_type: cisco_ios
+      username: admin
+      password: secret
+      secret: secret
+    access_switches:
+      - name: sw-duesseldorf-01
+        host: 10.0.2.11
+        device_type: cisco_ios
+        username: admin
+        password: secret
+        secret: secret
+      - name: sw-duesseldorf-02
+        host: 10.0.2.12
+        device_type: cisco_ios
+        username: admin
+        password: secret
+        secret: secret
+
+  - name: site-munich
+    description: Büro München
+    central_switch:
+      name: core-munich
+      host: 10.0.3.1
+      device_type: cisco_ios
+      username: admin
+      password: secret
+      secret: secret
+    access_switches:
+      - name: sw-munich-01
+        host: 10.0.3.11
+        device_type: cisco_ios
+        username: admin
+        password: secret
+        secret: secret

@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="panel">
+  <h2>MAC Suche Ergebnis - Site: {{ site.description }} ({{ site.name }})</h2>
+  <p><strong>MAC</strong> {{ mac_search.mac }} &nbsp; <strong>Interface</strong> {{ mac_search.interface }}</p>
+
+  <h3>CDP Neighbor</h3>
+  <p>{{ neighbor.cdp_name }} {{ neighbor.cdp_ip }}</p>
+
+  {% if mapped %}
+    <p><strong>Mapped Inventar</strong> {{ mapped.name }} ({{ mapped.host }})</p>
+    <p><a href="{{ url_for('switch_detail', site_name=site.name, name=mapped.name) }}">Zur Switchseite</a></p>
+    <p>
+      <a href="{{ url_for('search_mac_switch', site_name=site.name, switch_name=mapped.name, mac=mac_search.mac) }}">
+        Diese MAC auf dem Switch suchen
+      </a>
+    </p>
+  {% else %}
+    <p><em>Kein Mapping zu Inventar gefunden</em></p>
+  {% endif %}
+</div>
+
+<p><a href="{{ url_for('site_page', site_name=site.name) }}">Zurück</a></p>
+{% endblock %}
