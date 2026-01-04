@@ -5,14 +5,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from flask import Flask, render_template, request, redirect, url_for, flash
 from netmiko import ConnectHandler
 from cachetools import TTLCache
-
-# Configuration
-APP_HOST = "0.0.0.0"
-APP_PORT = 5000
-DEBUG = True
-TDR_CACHE_TTL = 60  # seconds
-INTERFACES_CACHE_TTL = 30  # seconds
-MAX_WORKERS = 8
+from config import APP_HOST, APP_PORT, DEBUG, SECRET_KEY, TDR_CACHE_TTL, INTERFACES_CACHE_TTL, MAX_WORKERS
 
 NETMIKO_ALLOWED_KEYS = {
     "device_type", "host", "username", "password", "secret", "allow_agent",
@@ -32,7 +25,7 @@ def sanitize_device_for_netmiko(device):
     return sanitized
 
 app = Flask(__name__)
-app.secret_key = "change_this_secret_change_in_prod"
+app.secret_key = SECRET_KEY
 
 # Load inventory with multiple sites
 with open("inventory.yaml") as f:
