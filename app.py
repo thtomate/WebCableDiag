@@ -1,11 +1,19 @@
 import re
 import time
 import yaml
+import logging
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from flask import Flask, render_template, request, redirect, url_for, flash
 from netmiko import ConnectHandler
 from cachetools import TTLCache
 from config import APP_HOST, APP_PORT, DEBUG, SECRET_KEY, TDR_CACHE_TTL, INTERFACES_CACHE_TTL, MAX_WORKERS
+
+# Configure logging
+logging.basicConfig(level=logging.WARNING, format="%(asctime)s - %(levelname)s - %(message)s")
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO if not DEBUG else logging.DEBUG)
+netmiko_logger = logging.getLogger("netmiko")
+#netmiko_logger.setLevel(logging.DEBUG)  # Uncomment for Netmiko debug logging
 
 NETMIKO_ALLOWED_KEYS = {
     "device_type", "host", "username", "password", "secret", "allow_agent",
@@ -81,6 +89,7 @@ def get_interfaces_for_device(device):
     Returns a list of interface dicts: {name, status, type}
     Uses caching to avoid frequent SSH calls.
     """
+    logger.info(f"Fetching interfaces for device {device.get('host')}")
     key = cache_key("iflist", device.get("host"))
     if key in interfaces_cache:
         return interfaces_cache[key]
@@ -88,7 +97,7 @@ def get_interfaces_for_device(device):
     conn = ssh_connect(device)
     try:
         out = conn.send_command("show interfaces status", delay_factor=1, use_textfsm=True)  # show int desc?
-        print(out)
+        logger.debug(f"Interface status output: {out}")
         # interfaces: list of {"name", "description", "status", "type"}
         interfaces = [
             {
@@ -107,6 +116,7 @@ def get_interfaces_for_device(device):
         conn.disconnect()
 
 def find_mac_on_central_for_site(site_name, mac):
+    logger.info(f"Searching for MAC {mac} on central switch for site: {site_name}")
     key = cache_key("mac", site_name, mac)
     if key in mac_cache:
         return mac_cache[key]
@@ -119,6 +129,7 @@ def find_mac_on_central_for_site(site_name, mac):
     try:
         cmd = f"show mac address-table address {m_formatted}"
         out = conn.send_command(cmd)  # may use textfsm
+        logger.debug(f"MAC search output: {out}")
         interface = None
         for line in out.splitlines():
             if m_formatted in line:
@@ -136,6 +147,7 @@ def find_mac_on_central_for_site(site_name, mac):
         conn.disconnect()
 
 def resolve_access_switch_from_interface_for_site(site_name, interface):
+    logger.info(f"Resolving access switch from interface {interface} for site: {site_name}")
     site = get_site_by_name(site_name)
     central = site.get("central_switch")
     conn = ssh_connect(central)
@@ -144,6 +156,7 @@ def resolve_access_switch_from_interface_for_site(site_name, interface):
         if "nxos" in central.get("device_type", ""):
             cmd = f"show cdp neighbors interface {interface} detail"
         out = conn.send_command(cmd)  # may use textfsm
+        logger.debug(f"CDP neighbor output: {out}")
         name = None
         ip = None
         for line in out.splitlines():
@@ -200,6 +213,7 @@ def tdr_single_interface(device, interface):
     """
     Run TDR diagnostics on a single interface and fetch the results after a delay.
     """
+    logger.info(f"Running TDR diagnostics on device {device.get('host')} for interface {interface}")
     key = cache_key("tdr", device.get("host"), interface)
     if key in tdr_cache:
         return tdr_cache[key]
@@ -212,6 +226,7 @@ def tdr_single_interface(device, interface):
             f"test cable-diagnostics tdr interface {interface}",
             expect_string=r"#|>", delay_factor=1
         )
+        logger.debug(f"TDR start output: {start_output}")
         if "Invalid input" in start_output or "Unknown command" in start_output or "Command not found" in start_output:
             parsed = {"raw": start_output, "error": "No valid TDR command on device"}
             tdr_cache[key] = parsed
@@ -222,7 +237,7 @@ def tdr_single_interface(device, interface):
         
         # Fetch TDR results
         result_output = conn.send_command(f"show cable-diagnostics tdr interface {interface}")
-        print(result_output)
+        logger.debug(f"TDR result output: {result_output}")
         parsed = parse_tdr_output(result_output)
         tdr_cache[key] = parsed
         return parsed
@@ -340,6 +355,7 @@ def search_mac_sitewide(site_name, mac):
 
 @app.route("/site/<site_name>/switch/<switch_name>/search_mac/<mac>", methods=["GET"])
 def search_mac_switch(site_name, switch_name, mac):
+    logger.info(f"Searching MAC {mac} on switch: {switch_name} in site: {site_name}")
     device = find_access_by_name(site_name, switch_name)
     if not device:
         flash("Switch nicht im Inventar für diese Site")
@@ -350,6 +366,7 @@ def search_mac_switch(site_name, switch_name, mac):
     try:
         cmd = f"show mac address-table address {m_formatted}"
         out = conn.send_command(cmd)
+        logger.debug(f"MAC search output: {out}")
         interface = None
         for line in out.splitlines():
             if m_formatted in line:
