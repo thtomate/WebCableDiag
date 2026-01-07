@@ -1,3 +1,13 @@
+# MacOS
+.DS_Store
+__MACOSX/
+
+# Generic
+*.bak
+*.orig
+*.tmp
+*.swp
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
