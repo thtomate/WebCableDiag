@@ -37,6 +37,7 @@ pip install -r requirements.txt
 ```
 
 Create a inventory.yaml in the project root based on inventory.yaml.sample and adjust it to your environment.
+You can use most parameters known to netmiko for AAA at device-level as well as at global level.
 
 ### Dev server
 
