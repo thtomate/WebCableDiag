@@ -1,0 +1,146 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: WebCableDiag\n"
+"POT-Creation-Date: 2026-01-13 00:00+0000\n"
+"PO-Revision-Date: 2026-01-13 00:00+0000\n"
+"Last-Translator: WebCableDiag Bot <noreply@example.com>\n"
+"Language-Team: German\n"
+"Language: de\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: templates/index.html:3
+msgid "Select site"
+msgstr "Standort auswählen"
+
+msgid "Central"
+msgstr "Zentrale"
+
+msgid "Access"
+msgstr "Access"
+
+msgid "switches"
+msgstr "Switches"
+
+#: templates/site.html:3
+msgid "Site"
+msgstr "Standort"
+
+msgid "Central switch"
+msgstr "Zentraler Switch"
+
+msgid "MAC address search on central switch (Which switch has the endpoint?)"
+msgstr "MAC-Adress-Suche auf zentralem Switch (An welchem Switch ist das Endgerät?)"
+
+msgid "Search"
+msgstr "Suchen"
+
+msgid "Switches to choose from"
+msgstr "Switche zur Auswahl"
+
+msgid "Back to site selection"
+msgstr "Zurück zur Standortauswahl"
+
+#: templates/switch.html
+msgid "Switch"
+msgstr "Switch"
+
+msgid "MAC address search on this switch (Which port is the endpoint on?)"
+msgstr "MAC-Adress-Suche auf diesem Switch (An welchem Port ist das Endgerät?)"
+
+msgid "Available interfaces"
+msgstr "Verfügbare Interfaces"
+
+msgid "Select all"
+msgstr "Alle auswählen"
+
+msgid "Deselect all"
+msgstr "Alle abwählen"
+
+msgid "Or add manually"
+msgstr "Oder manuell hinzufügen"
+
+msgid "Run TDR"
+msgstr "TDR ausführen"
+
+msgid "No interfaces found or error fetching."
+msgstr "Keine Interfaces gefunden oder Fehler beim Abruf."
+
+msgid "Interfaces (comma separated)"
+msgstr "Interfaces (Kommagetrennt)"
+
+#: templates/results.html
+msgid "Results for"
+msgstr "Ergebnisse für"
+
+msgid "Error"
+msgstr "Fehler"
+
+msgid "Pair"
+msgstr "Pair"
+
+msgid "Status"
+msgstr "Status"
+
+msgid "Approximate length (m)"
+msgstr "Ungefähre Länge (m)"
+
+msgid "Details"
+msgstr "Details"
+
+msgid "Back"
+msgstr "Zurück"
+
+#: templates/mac_result.html
+msgid "MAC search result"
+msgstr "MAC Suche Ergebnis"
+
+msgid "MAC"
+msgstr "MAC"
+
+msgid "Interface"
+msgstr "Interface"
+
+msgid "CDP Neighbor"
+msgstr "CDP Neighbor"
+
+msgid "Mapped inventory"
+msgstr "Mapped Inventar"
+
+msgid "To switch page"
+msgstr "Zur Switchseite"
+
+msgid "Search this MAC on the switch"
+msgstr "Diese MAC auf dem Switch suchen"
+
+msgid "No mapping to inventory found"
+msgstr "Kein Mapping zu Inventar gefunden"
+
+#: app.py
+msgid "Invalid MAC address"
+msgstr "Ungültige MAC Adresse"
+
+msgid "Site not found"
+msgstr "Site nicht gefunden"
+
+msgid "No interfaces selected"
+msgstr "Keine Schnittstellen ausgewählt"
+
+msgid "Error fetching interfaces: %(err)s"
+msgstr "Fehler beim Abrufen der Interfaces: %(err)s"
+
+msgid "Invalid MAC address or site not present"
+msgstr "Ungültige MAC Adresse oder Site nicht vorhanden"
+
+msgid "MAC not found in central switch MAC table"
+msgstr "MAC nicht in MAC‑Tabelle des zentralen Switches gefunden"
+
+msgid "MAC not found in switch MAC table"
+msgstr "MAC nicht in MAC‑Tabelle des Switches gefunden"
+
+msgid "Switch not in inventory for this site"
+msgstr "Switch nicht im Inventar für diese Site"
+
+msgid "MAC %(mac)s found on interface %(iface)s. Attempting to highlight."
+msgstr "MAC %(mac)s gefunden auf Schnittstelle %(iface)s. Ich versuche es dir schon zu markieren."

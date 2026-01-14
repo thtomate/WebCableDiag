@@ -3,7 +3,8 @@ import time
 import yaml
 import logging
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, session
+from flask_babel import Babel, gettext as _
 from netmiko import ConnectHandler
 from cachetools import TTLCache
 from config import APP_HOST, APP_PORT, DEBUG, SECRET_KEY, TDR_CACHE_TTL, INTERFACES_CACHE_TTL, MAX_WORKERS
@@ -34,6 +35,40 @@ def sanitize_device_for_netmiko(device):
 
 app = Flask(__name__)
 app.secret_key = SECRET_KEY
+
+# i18n configuration
+app.config.setdefault("BABEL_DEFAULT_LOCALE", "en")
+app.config.setdefault("BABEL_SUPPORTED_LOCALES", ["en", "de"])
+app.config.setdefault("BABEL_TRANSLATION_DIRECTORIES", "translations")
+babel = Babel(app)
+
+
+def get_locale():
+    # precedence: query param -> session -> Accept-Language header -> default
+    lang = request.args.get("lang")
+    if lang:
+        session["lang"] = lang
+        return lang
+    lang = session.get("lang")
+    if lang:
+        return lang
+    return request.accept_languages.best_match(app.config.get("BABEL_SUPPORTED_LOCALES", ["en", "de"]))
+
+babel.init_app(app, locale_selector=get_locale)
+
+
+@app.context_processor
+def inject_locale():
+    return {"current_locale": str(get_locale())}
+
+
+@app.route('/set_language/<lang>')
+def set_language(lang):
+    if lang not in app.config.get('BABEL_SUPPORTED_LOCALES', ['en','de']):
+        lang = app.config.get('BABEL_DEFAULT_LOCALE', 'en')
+    session['lang'] = lang
+    ref = request.referrer or url_for('index')
+    return redirect(ref)
 
 # Load inventory with multiple sites
 with open("inventory.yaml") as f:
@@ -80,7 +115,7 @@ def cache_key(prefix, *parts):
 def normalize_mac(mac):
     s = re.sub(r"[^0-9a-fA-F]", "", mac).lower()
     if len(s) != 12:
-        raise ValueError("Ungültige MAC Adresse")
+        raise ValueError(_("Invalid MAC address"))
     return s[0:4] + "." + s[4:8] + "." + s[8:12]
 
 # --- Interfaces retrieval and parsing ----------------------------------------
@@ -122,7 +157,7 @@ def find_mac_on_central_for_site(site_name, mac):
         return mac_cache[key]
     site = get_site_by_name(site_name)
     if not site:
-        raise ValueError("Site nicht gefunden")
+        raise ValueError(_("Site not found"))
     central = site.get("central_switch")
     m_formatted = normalize_mac(mac)
     conn = ssh_connect(central)
@@ -266,7 +301,7 @@ def index():
 def site_page(site_name):
     site = get_site_by_name(site_name)
     if not site:
-        flash("Site nicht gefunden")
+        flash(_("Site not found"))
         return redirect(url_for("index"))
     access_list = site.get("access_switches", [])
     central = site.get("central_switch")
@@ -283,11 +318,11 @@ def site_page(site_name):
 def switch_detail(site_name, name):
     site = get_site_by_name(site_name)
     if not site:
-        flash("Site nicht gefunden")
+        flash(_("Site not found"))
         return redirect(url_for("index"))
     device = find_access_by_name(site_name, name)
     if not device:
-        flash("Switch nicht im Inventar für diese Site")
+        flash(_("Switch not in inventory for this site"))
         return redirect(url_for("site_page", site_name=site_name))
 
     if request.method == "POST":
@@ -306,7 +341,7 @@ def switch_detail(site_name, name):
                 chosen.extend(extras)
             chosen = [c for c in chosen if c]
             if not chosen:
-                flash("Keine Schnittstellen ausgewählt")
+                flash(_("No interfaces selected"))
                 return redirect(url_for("switch_detail", site_name=site_name, name=name))
             results = tdr_on_switch_async(device, chosen)
             return render_template("results.html", device=device, results=results, site=site)
@@ -316,7 +351,7 @@ def switch_detail(site_name, name):
         interfaces = get_interfaces_for_device(device)
     except Exception as e:
         interfaces = []
-        flash(f"Fehler beim Abrufen der Interfaces: {e}")
+        flash(_("Error fetching interfaces: %(err)s", err=str(e)))
     
     # show cached TDR results of this switch if available
     cached_results = [
@@ -335,12 +370,12 @@ def search_mac_sitewide(site_name, mac):
     try:
         mac_result = find_mac_on_central_for_site(site_name, mac)
     except ValueError as ve:
-        flash("Ungültige MAC Adresse oder Site nicht vorhanden")
+        flash(_("Invalid MAC address or site not present"))
         print(ve)
         return redirect(url_for("site_page", site_name=site_name))
     interface = mac_result.get("interface")
     if not interface:
-        flash("MAC nicht in MAC‑Tabelle des zentralen Switches gefunden")
+        flash(_("MAC not found in central switch MAC table"))
         return redirect(url_for("site_page", site_name=site_name))
     neighbor = resolve_access_switch_from_interface_for_site(site_name, interface)
     mapped = None
@@ -358,7 +393,7 @@ def search_mac_switch(site_name, switch_name, mac):
     logger.info(f"Searching MAC {mac} on switch: {switch_name} in site: {site_name}")
     device = find_access_by_name(site_name, switch_name)
     if not device:
-        flash("Switch nicht im Inventar für diese Site")
+        flash(_("Switch not in inventory for this site"))
         return redirect(url_for("site_page", site_name=site_name))
     
     m_formatted = normalize_mac(mac)
@@ -381,10 +416,10 @@ def search_mac_switch(site_name, switch_name, mac):
     finally:
         conn.disconnect()
     if not interface:
-        flash("MAC nicht in MAC‑Tabelle des Switches gefunden")
+        flash(_("MAC not found in switch MAC table"))
         return redirect(url_for("switch_detail", site_name=site_name, name=switch_name))
     else:
-        flash(f"MAC {m_formatted} gefunden auf Schnittstelle {interface}. Ich versuche es dir schon zu markieren.")
+        flash(_("MAC %(mac)s found on interface %(iface)s. Attempting to highlight.", mac=m_formatted, iface=interface))
         return redirect(url_for("switch_detail", site_name=site_name, name=switch_name, highlighted_ifaces=interface))
 
 

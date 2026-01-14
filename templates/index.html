@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="panel">
-  <h2>Standort auswählen</h2>
+  <h2>{{ _('Select site') }}</h2>
   <ul>
     {% for s in sites %}
-      <li><a href="{{ url_for('site_page', site_name=s.name) }}"><strong>{{ s.description }}</strong> ({{ s.name }})</a> - Zentrale: {{ s.central_switch.name }}; Access: {{ s.access_switches|length }} Switches</li>
+      <li><a href="{{ url_for('site_page', site_name=s.name) }}"><strong>{{ s.description }}</strong> ({{ s.name }})</a> - {{ _('Central') }}: {{ s.central_switch.name }}; {{ _('Access') }}: {{ s.access_switches|length }} {{ _('switches') }}</li>
     {% endfor %}
   </ul>
 </div>

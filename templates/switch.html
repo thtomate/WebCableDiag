@@ -1,19 +1,19 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="panel">
-  <h2>Switch: {{ device.name }} ({{ device.host }}) - Site: {{ site.description }}</h2>
+  <h2>{{ _('Switch') }}: {{ device.name }} ({{ device.host }}) - {{ _('Site') }}: {{ site.description }}</h2>
 
-  <h3>MAC-Adress-Suche auf diesem Switch (An welchem Port ist das Endgerät?)</h3>
+  <h3>{{ _('MAC address search on this switch (Which port is the endpoint on?)') }}</h3>
   <form method="post">
-    <input name="mac" placeholder="00:11:22:33:44:55 oder 0011.2233.4455" style="width:40%">
-    <button name="search_mac" type="submit">Suchen</button>
+    <input name="mac" placeholder="00:11:22:33:44:55 or 0011.2233.4455" style="width:40%">
+    <button name="search_mac" type="submit">{{ _('Search') }}</button>
   </form>
 
-  <h3>Verfügbare Interfaces</h3>
+  <h3>{{ _('Available interfaces') }}</h3>
   {% if interfaces %}
     <div>
-      <button type="button" id="select_all">Alle auswählen</button>
-      <button type="button" id="deselect_all">Alle abwählen</button>
+      <button type="button" id="select_all">{{ _('Select all') }}</button>
+      <button type="button" id="deselect_all">{{ _('Deselect all') }}</button>
     </div>
     <form method="post" id="tdr_form">
       <div style="max-height:300px; overflow:auto; border:1px solid #eee; padding:8px; margin-top:8px;">
@@ -28,17 +28,17 @@
         {% endfor %}
       </div>
 
-      <h4>Oder manuell hinzufügen</h4>
-      <input name="interfaces_free" placeholder="z.B. Gi1/0/24, Gi1/0/25" style="width:60%"><br><br>
+      <h4>{{ _('Or add manually') }}</h4>
+      <input name="interfaces_free" placeholder="eg. Gi1/0/24, Gi1/0/25" style="width:60%"><br><br>
 
-      <button name="run_tdr" type="submit">TDR ausführen</button>
+      <button name="run_tdr" type="submit">{{ _('Run TDR') }}</button>
     </form>
   {% else %}
-    <p><em>Keine Interfaces gefunden oder Fehler beim Abruf.</em></p>
+    <p><em>{{ _('No interfaces found or error fetching.') }}</em></p>
     <form method="post">
-      <label>Interfaces (Kommagetrennt)</label><br>
+      <label>{{ _('Interfaces (comma separated)') }}</label><br>
       <input name="interfaces_free" style="width:60%"><br><br>
-      <button name="run_tdr" type="submit">TDR ausführen</button>
+      <button name="run_tdr" type="submit">{{ _('Run TDR') }}</button>
     </form>
   {% endif %}
 

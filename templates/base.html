@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="de">
+<html lang="{{ current_locale }}">
   <head>
     <meta charset="utf-8">
     <title>WebCableDiag</title>
@@ -13,6 +13,10 @@
   </head>
   <body>
     <h1>WebCableDiag</h1>
+    <div style="float:right">
+      <a href="{{ url_for('set_language', lang='en') }}">English</a> |
+      <a href="{{ url_for('set_language', lang='de') }}">Deutsch</a>
+    </div>
     <div>
       {% with messages = get_flashed_messages() %}
         {% if messages %}

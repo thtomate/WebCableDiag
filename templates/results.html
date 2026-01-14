@@ -1,15 +1,15 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="panel">
-  <h2>Ergebnisse für {{ device.name }} ({{ device.host }})</h2>
+  <h2>{{ _('Results for') }} {{ device.name }} ({{ device.host }})</h2>
   {% for iface, parsed in results.items() %}
     <h3>{{ iface }}</h3>
     {% if parsed.error %}
-      <div style="color:darkred">Fehler: {{ parsed.error }}</div>
+      <div style="color:darkred">{{ _('Error') }}: {{ parsed.error }}</div>
     {% endif %}
     {% if parsed.pairs %}
       <table>
-        <thead><tr><th>Pair</th><th>Status</th><th>Ungefähre Länge (m)</th><th>Details</th></tr></thead>
+        <thead><tr><th>{{ _('Pair') }}</th><th>{{ _('Status') }}</th><th>{{ _('Approximate length (m)') }}</th><th>{{ _('Details') }}</th></tr></thead>
         <tbody>
         {% for p in parsed.pairs %}
           <tr>
@@ -27,6 +27,6 @@
     {% endif %}
     <hr>
   {% endfor %}
-  <a href="{{ url_for('switch_detail', site_name=site.name, name=device.name) }}">Zurück</a>
+  <a href="{{ url_for('switch_detail', site_name=site.name, name=device.name) }}">{{ _('Back') }}</a>
 </div>
 {% endblock %}
